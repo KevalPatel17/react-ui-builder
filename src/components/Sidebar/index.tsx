@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { PlusCircle, Layout, Palette, Layers, Search, Trash2 } from 'lucide-react';
+import { PlusCircle, Layout, Palette, Layers, Search, Trash2, Sparkles } from 'lucide-react';
 import { useBuilderStore } from '../../store/builderStore';
 import { ComponentTab } from './ComponentTab';
 import { LayoutTab } from './LayoutTab';
 import { ColorsTab } from './ColorsTab';
 import { LayersTab } from './LayersTab';
+import { CriticTab } from './CriticTab';
 
 export const Sidebar: React.FC = () => {
   const { componentSearch, setComponentSearch, elements, clearCanvas } = useBuilderStore();
-  const [activeTab, setActiveTab] = useState<'components' | 'layout' | 'colors' | 'layers'>('components');
+  const [activeTab, setActiveTab] = useState<'components' | 'layout' | 'colors' | 'layers' | 'critic'>('components');
 
   const tabs = [
     { id: 'components', label: 'Components', icon: <PlusCircle className="w-4 h-4" /> },
     { id: 'layout', label: 'Layout', icon: <Layout className="w-4 h-4" /> },
     { id: 'colors', label: 'Colors', icon: <Palette className="w-4 h-4" /> },
     { id: 'layers', label: 'Layers', icon: <Layers className="w-4 h-4" /> },
+    { id: 'critic', label: 'AI Critic', icon: <Sparkles className="w-4 h-4" /> },
   ] as const;
 
   return (
@@ -59,6 +61,7 @@ export const Sidebar: React.FC = () => {
         {activeTab === 'layout' && <LayoutTab />}
         {activeTab === 'colors' && <ColorsTab />}
         {activeTab === 'layers' && <LayersTab />}
+        {activeTab === 'critic' && <CriticTab />}
       </div>
 
       {/* Clear Canvas / Quick Actions bottom bar */}

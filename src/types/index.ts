@@ -136,6 +136,13 @@ export interface ComponentProps {
   label?: string;
   helperText?: string;
   error?: boolean;
+
+  // Interaction triggers
+  clickAction?: {
+    type: 'show' | 'hide' | 'alert' | 'none';
+    targetId?: string;
+    value?: string; // Alert message
+  };
 }
 
 export interface CanvasElement {

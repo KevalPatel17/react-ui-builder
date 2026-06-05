@@ -526,6 +526,92 @@ export const ComponentSection: React.FC<ComponentSectionProps> = ({ element }) =
             </div>
           </div>
         )}
+
+        {/* Prototyping Interactions trigger configuration */}
+        <div className="pt-3.5 border-t border-[#1f202c]/50 mt-3.5">
+          <label className="text-[9px] text-indigo-400 font-bold uppercase block mb-1">
+            Click Action (Prototype Mode)
+          </label>
+          <div className="space-y-2.5">
+            <div>
+              <label className="text-[8px] text-gray-500 font-bold uppercase block mb-0.5">Action Type</label>
+              <select
+                value={props.clickAction?.type ?? 'none'}
+                onChange={(e) => {
+                  const type = e.target.value as any;
+                  handlePropsChange({
+                    clickAction: {
+                      type,
+                      targetId: props.clickAction?.targetId ?? '',
+                      value: props.clickAction?.value ?? ''
+                    }
+                  });
+                  saveToHistory();
+                }}
+                disabled={element.locked}
+                className="w-full bg-[#0b0c11] border border-[#1f202c] text-white text-[11px] rounded px-1.5 py-1 focus:outline-none"
+              >
+                <option value="none">No Action</option>
+                <option value="show">Show Element</option>
+                <option value="hide">Hide Element</option>
+                <option value="alert">Show Alert Message</option>
+              </select>
+            </div>
+
+            {/* Target Element Selector for Show/Hide */}
+            {((props.clickAction?.type === 'show') || (props.clickAction?.type === 'hide')) && (
+              <div>
+                <label className="text-[8px] text-gray-500 font-bold uppercase block mb-0.5">Target Layer</label>
+                <select
+                  value={props.clickAction?.targetId ?? ''}
+                  onChange={(e) => {
+                    handlePropsChange({
+                      clickAction: {
+                        ...props.clickAction!,
+                        targetId: e.target.value
+                      }
+                    });
+                    saveToHistory();
+                  }}
+                  disabled={element.locked}
+                  className="w-full bg-[#0b0c11] border border-[#1f202c] text-white text-[11px] rounded px-1.5 py-1 focus:outline-none"
+                >
+                  <option value="">-- Select Element --</option>
+                  {useBuilderStore.getState().elements
+                    .filter((el) => el.id !== element.id)
+                    .map((el) => (
+                      <option key={el.id} value={el.id}>
+                        {el.name} ({el.type})
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+
+            {/* Message Input for Alert */}
+            {props.clickAction?.type === 'alert' && (
+              <div>
+                <label className="text-[8px] text-gray-500 font-bold uppercase block mb-0.5">Alert Message</label>
+                <input
+                  type="text"
+                  value={props.clickAction?.value ?? ''}
+                  onChange={(e) => {
+                    handlePropsChange({
+                      clickAction: {
+                        ...props.clickAction!,
+                        value: e.target.value
+                      }
+                    });
+                  }}
+                  onBlur={handleBlur}
+                  disabled={element.locked}
+                  placeholder="Enter alert text..."
+                  className="w-full bg-[#0b0c11] border border-[#1f202c] hover:border-gray-700 text-xs text-white rounded px-2.5 py-1.5 focus:outline-none"
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

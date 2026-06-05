@@ -15,7 +15,8 @@ import {
   AlignVerticalJustifyCenter,
   AlignHorizontalJustifyCenter,
   Code,
-  Sparkles
+  Sparkles,
+  Pencil
 } from 'lucide-react';
 import { useBuilderStore } from '../../store/builderStore';
 
@@ -42,7 +43,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onOpenExport }) => {
     setDarkMode,
     previewMode,
     setPreviewMode,
-    alignSelected
+    alignSelected,
+    drawMode,
+    setDrawMode
   } = useBuilderStore();
 
   const canUndo = historyIndex > 0;
@@ -89,6 +92,21 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onOpenExport }) => {
               title="Redo (Ctrl+Y)"
             >
               <Redo className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Draw/Sketch Mode Toggle */}
+          <div className="flex items-center gap-1 bg-gray-950 p-1 rounded-lg border border-gray-900">
+            <button
+              onClick={() => setDrawMode(!drawMode)}
+              className={`p-1.5 rounded transition-all cursor-pointer ${
+                drawMode
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800'
+              }`}
+              title={drawMode ? "Exit Draw Mode" : "Draw to UI (Sketch Components)"}
+            >
+              <Pencil className="w-4 h-4" />
             </button>
           </div>
 

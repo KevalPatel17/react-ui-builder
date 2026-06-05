@@ -7,6 +7,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useDragElement } from '../../hooks/useDragElement';
 import type { GuideLine } from '../../utils/snapGuides';
 import { createDefaultElement } from '../Sidebar/ComponentTab';
+import type { ComponentType } from '../../types';
 
 export const Canvas: React.FC = () => {
   const {
@@ -17,6 +18,8 @@ export const Canvas: React.FC = () => {
     gridVisible,
     previewMode,
     addElement,
+    drawMode,
+    setDrawMode,
   } = useBuilderStore();
 
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -32,6 +35,10 @@ export const Canvas: React.FC = () => {
 
   // Selection Marquee (Click & Drag to select)
   const [marquee, setMarquee] = useState<{ startX: number; startY: number; currentX: number; currentY: number } | null>(null);
+
+  // Draw Mode Drawing States
+  const [drawingRect, setDrawingRect] = useState<{ startX: number; startY: number; currentX: number; currentY: number } | null>(null);
+  const [drawMenu, setDrawMenu] = useState<{ clientX: number; clientY: number; rect: { x: number; y: number; w: number; h: number } } | null>(null);
 
   // Bind Keyboard Shortcuts
   useKeyboardShortcuts();
@@ -115,6 +122,18 @@ export const Canvas: React.FC = () => {
 
     setContextMenu(null);
 
+    // If drawMode is active, draw a custom component bounding box
+    if (drawMode) {
+      if (e.target === artboardRef.current) {
+        const rect = artboardRef.current.getBoundingClientRect();
+        const clickX = (e.clientX - rect.left) / (zoom / 100);
+        const clickY = (e.clientY - rect.top) / (zoom / 100);
+        setDrawingRect({ startX: clickX, startY: clickY, currentX: clickX, currentY: clickY });
+        setDrawMenu(null); // Clear previous menu if drawing again
+      }
+      return;
+    }
+
     // Click on canvas background deselects elements
     if (e.target === artboardRef.current || e.target === canvasContainerRef.current) {
       selectElements([]);
@@ -137,6 +156,14 @@ export const Canvas: React.FC = () => {
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    if (drawMode && drawingRect && artboardRef.current) {
+      const rect = artboardRef.current.getBoundingClientRect();
+      const currentX = (e.clientX - rect.left) / (zoom / 100);
+      const currentY = (e.clientY - rect.top) / (zoom / 100);
+      setDrawingRect((prev) => prev ? { ...prev, currentX, currentY } : null);
+      return;
+    }
+
     if (marquee && artboardRef.current) {
       const rect = artboardRef.current.getBoundingClientRect();
       const currentX = (e.clientX - rect.left) / (zoom / 100);
@@ -172,9 +199,55 @@ export const Canvas: React.FC = () => {
     }
   };
 
-  const handleCanvasMouseUp = () => {
+  const handleCanvasMouseUp = (e: React.MouseEvent) => {
     setIsPanning(false);
     setMarquee(null);
+
+    if (drawMode && drawingRect) {
+      const x = Math.min(drawingRect.startX, drawingRect.currentX);
+      const y = Math.min(drawingRect.startY, drawingRect.currentY);
+      const w = Math.abs(drawingRect.startX - drawingRect.currentX);
+      const h = Math.abs(drawingRect.startY - drawingRect.currentY);
+
+      if (w > 5 && h > 5) {
+        // Show components popup near the cursor
+        setDrawMenu({
+          clientX: e.clientX,
+          clientY: e.clientY,
+          rect: { x, y, w, h }
+        });
+      }
+      setDrawingRect(null);
+    }
+  };
+
+  const handleCreateComponent = (type: ComponentType) => {
+    if (!drawMenu) return;
+    const { rect } = drawMenu;
+    const id = `${type}_${Math.random().toString(36).substr(2, 9)}`;
+    const defaultEl = createDefaultElement(type, id);
+    
+    // Override position and size
+    defaultEl.x = Math.round(rect.x / 8) * 8;
+    defaultEl.y = Math.round(rect.y / 8) * 8;
+    defaultEl.width = Math.max(30, Math.round(rect.w / 8) * 8);
+    defaultEl.height = Math.max(20, Math.round(rect.h / 8) * 8);
+    
+    // Grid alignment overrides if flex/grid
+    if (type.includes('col') || type.includes('grid')) {
+      defaultEl.style.display = 'grid';
+      if (type === 'container-2col') defaultEl.style.gridColumns = 2;
+      else if (type === 'container-3col') defaultEl.style.gridColumns = 3;
+      else if (type === 'container-4col') defaultEl.style.gridColumns = 4;
+      else defaultEl.style.gridColumns = 1;
+    } else if (type.includes('flex')) {
+      defaultEl.style.display = 'flex';
+      defaultEl.style.flexDirection = type === 'flex-row' ? 'row' : 'column';
+    }
+
+    addElement(defaultEl);
+    setDrawMenu(null);
+    setDrawMode(false); // Disable draw mode after inserting
   };
 
   // --- HTML5 Drag & Drop from Sidebar ---
@@ -253,7 +326,7 @@ export const Canvas: React.FC = () => {
   };
 
   // Root canvas elements (top-level only, nested renders inside themselves)
-  const rootElements = elements.filter((el) => !el.parentId && !el.hidden);
+  const rootElements = elements.filter((el) => !el.parentId && (!previewMode || !el.hidden));
 
   return (
     <div
@@ -319,8 +392,62 @@ export const Canvas: React.FC = () => {
               }}
             />
           )}
+          {/* Drawing Mode Visual Box */}
+          {drawingRect && (
+            <div
+              className="absolute bg-emerald-500/15 border-2 border-emerald-500 border-dashed pointer-events-none z-[9999]"
+              style={{
+                left: `${Math.min(drawingRect.startX, drawingRect.currentX)}px`,
+                top: `${Math.min(drawingRect.startY, drawingRect.currentY)}px`,
+                width: `${Math.abs(drawingRect.startX - drawingRect.currentX)}px`,
+                height: `${Math.abs(drawingRect.startY - drawingRect.currentY)}px`,
+              }}
+            />
+          )}
         </div>
       </div>
+
+      {/* Draw Menu Component Selection popup */}
+      {drawMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${drawMenu.clientX + 10}px`,
+            top: `${drawMenu.clientY + 10}px`,
+            zIndex: 99999,
+          }}
+          className="bg-[#12131a] border border-[#1f202c] shadow-2xl rounded-xl p-2 w-48 text-left animate-scale-up"
+        >
+          <div className="text-[9px] font-bold text-gray-500 uppercase tracking-wider px-2 py-1 mb-1 border-b border-[#1f202c]">
+            Convert sketch to:
+          </div>
+          <div className="flex flex-col gap-0.5">
+            {[
+              { type: 'primary-btn', label: 'Primary Button' },
+              { type: 'text-input', label: 'Form Input' },
+              { type: 'heading', label: 'Heading Text' },
+              { type: 'paragraph', label: 'Paragraph Body' },
+              { type: 'card', label: 'Card Container' },
+              { type: 'container-2col', label: '2-Col Grid Layout' },
+              { type: 'circle', label: 'Circle Shape' },
+            ].map((item) => (
+              <button
+                key={item.type}
+                onClick={() => handleCreateComponent(item.type as ComponentType)}
+                className="w-full text-left px-2 py-1.5 rounded hover:bg-indigo-600 hover:text-white text-gray-300 text-xs transition-colors cursor-pointer"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setDrawMenu(null)}
+            className="w-full text-center mt-1 text-[10px] text-gray-500 hover:text-rose-400 border-t border-[#1f202c] pt-1.5 cursor-pointer transition-colors"
+          >
+            Cancel Sketch
+          </button>
+        </div>
+      )}
 
       {/* Right Click Context Menu overlay */}
       {contextMenu && (

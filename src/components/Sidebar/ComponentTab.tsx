@@ -394,12 +394,20 @@ export const createDefaultElement = (type: ComponentType, id: string, x = 100, y
     case 'search-input':
       defaultProps.placeholder = `Enter ${type.split('-')[0]}...`;
       defaultProps.label = name;
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 240;
       height = 68;
       break;
     case 'textarea':
       defaultProps.placeholder = 'Type comments here...';
       defaultProps.label = 'Description';
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 280;
       height = 98;
       break;
@@ -408,41 +416,69 @@ export const createDefaultElement = (type: ComponentType, id: string, x = 100, y
       defaultProps.placeholder = 'Select option...';
       defaultProps.options = ['Option A', 'Option B', 'Option C'];
       defaultProps.label = 'Choose Choice';
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 240;
       height = 68;
       break;
     case 'checkbox':
       defaultProps.text = 'Accept terms & conditions';
       defaultProps.checked = false;
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 220;
       height = 24;
       break;
     case 'radio-group':
       defaultProps.options = ['Option 1', 'Option 2', 'Option 3'];
       defaultProps.text = 'Radio Selection';
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 200;
       height = 80;
       break;
     case 'toggle-switch':
       defaultProps.text = 'Enable feature';
       defaultProps.checked = true;
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 180;
       height = 28;
       break;
     case 'slider':
       defaultProps.text = 'Volume';
       defaultProps.fontSize = 12;
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 220;
       height = 44;
       break;
     case 'date-picker':
       defaultProps.label = 'Select Date';
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 220;
       height = 68;
       break;
     case 'file-upload':
       defaultProps.label = 'Upload File';
       defaultProps.placeholder = 'Drag & drop file here...';
+      defaultStyle.backgroundColor = 'transparent';
+      defaultStyle.borderWidth = 0;
+      defaultStyle.padding = { t: 0, r: 0, b: 0, l: 0 };
+      defaultStyle.boxShadow = { x: 0, y: 0, blur: 0, spread: 0, color: '#000000', opacity: 0 };
       width = 260;
       height = 100;
       break;

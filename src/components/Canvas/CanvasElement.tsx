@@ -39,6 +39,12 @@ export const CanvasElement: React.FC<CanvasElementProps> = ({ element, onStartDr
       ? `${shadow.x}px ${shadow.y}px ${shadow.blur}px ${shadow.spread}px rgba(0, 0, 0, ${shadow.opacity})`
       : 'none';
 
+    const isFormElement = [
+      'text-input', 'password-input', 'email-input', 'number-input', 'search-input',
+      'textarea', 'select', 'multi-select', 'checkbox', 'radio-group',
+      'toggle-switch', 'slider', 'date-picker', 'file-upload'
+    ].includes(element.type);
+
     const baseStyles: React.CSSProperties = {
       position: isNested ? 'relative' : 'absolute',
       left: isNested ? undefined : `${element.x}px`,
@@ -47,18 +53,8 @@ export const CanvasElement: React.FC<CanvasElementProps> = ({ element, onStartDr
       height: isNested ? 'auto' : `${element.height}px`,
       transform: element.rotation ? `rotate(${element.rotation}deg)` : undefined,
       zIndex: element.zIndex,
-      backgroundColor: style.backgroundColor,
       color: style.textColor,
       opacity: style.opacity,
-      borderColor: style.borderColor,
-      borderWidth: `${style.borderWidth}px`,
-      borderStyle: style.borderStyle,
-      borderRadius: `${style.borderRadius}px`,
-      boxShadow: shadowStr,
-      paddingTop: `${style.padding.t}px`,
-      paddingRight: `${style.padding.r}px`,
-      paddingBottom: `${style.padding.b}px`,
-      paddingLeft: `${style.padding.l}px`,
       marginTop: `${style.margin.t}px`,
       marginRight: `${style.margin.r}px`,
       marginBottom: `${style.margin.b}px`,
@@ -67,6 +63,19 @@ export const CanvasElement: React.FC<CanvasElementProps> = ({ element, onStartDr
       transition: 'box-shadow 0.2s border-color 0.2s',
       cursor: isPreview ? (element.props.clickable ? 'pointer' : 'default') : 'move',
     };
+
+    if (!isFormElement) {
+      baseStyles.backgroundColor = style.backgroundColor;
+      baseStyles.borderColor = style.borderColor;
+      baseStyles.borderWidth = `${style.borderWidth}px`;
+      baseStyles.borderStyle = style.borderStyle;
+      baseStyles.borderRadius = `${style.borderRadius}px`;
+      baseStyles.boxShadow = shadowStr;
+      baseStyles.paddingTop = `${style.padding.t}px`;
+      baseStyles.paddingRight = `${style.padding.r}px`;
+      baseStyles.paddingBottom = `${style.padding.b}px`;
+      baseStyles.paddingLeft = `${style.padding.l}px`;
+    }
 
     // Container Specific flex/grid layouts
     if (style.display === 'flex') {
@@ -90,7 +99,7 @@ export const CanvasElement: React.FC<CanvasElementProps> = ({ element, onStartDr
 
   // Find direct nested children
   const children = elements
-    .filter((el) => el.parentId === element.id && !el.hidden)
+    .filter((el) => el.parentId === element.id && (!previewMode || !el.hidden))
     .sort((a, b) => a.zIndex - b.zIndex);
 
   // Render internal component markup
@@ -576,8 +585,20 @@ export const CanvasElement: React.FC<CanvasElementProps> = ({ element, onStartDr
         }
       }}
       onClick={(e) => {
-        if (previewMode) return;
         e.stopPropagation();
+        if (previewMode) {
+          const action = element.props.clickAction;
+          if (action && action.type !== 'none') {
+            if (action.type === 'show' && action.targetId) {
+              useBuilderStore.getState().updateElement(action.targetId, { hidden: false });
+            } else if (action.type === 'hide' && action.targetId) {
+              useBuilderStore.getState().updateElement(action.targetId, { hidden: true });
+            } else if (action.type === 'alert' && action.value) {
+              alert(action.value);
+            }
+          }
+          return;
+        }
         
         // Multi-select with Shift
         if (e.shiftKey) {

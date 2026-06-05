@@ -16,6 +16,7 @@ interface BuilderState {
   componentSearch: string;
   favorites: ComponentType[];
   previewMode: boolean;
+  drawMode: boolean;
   
   // Actions
   addElement: (el: CanvasElement) => void;
@@ -48,6 +49,7 @@ interface BuilderState {
   setComponentSearch: (query: string) => void;
   toggleFavorite: (type: ComponentType) => void;
   setPreviewMode: (preview: boolean) => void;
+  setDrawMode: (active: boolean) => void;
   clearCanvas: () => void;
   loadTemplate: (elements: CanvasElement[]) => void;
 }
@@ -81,6 +83,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
     componentSearch: '',
     favorites: [],
     previewMode: false,
+    drawMode: false,
 
     saveToHistory: () => {
       const { elements, history, historyIndex } = get();
@@ -534,7 +537,11 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
     },
 
     setPreviewMode: (preview) => {
-      set({ previewMode: preview, selectedIds: [] });
+      set({ previewMode: preview, selectedIds: [], drawMode: false });
+    },
+
+    setDrawMode: (active) => {
+      set({ drawMode: active, selectedIds: [] });
     },
 
     clearCanvas: () => {

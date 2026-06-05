@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "project": "react-ui-builder",
+  "projectRoot": "d:\\Python\\react-ui-builder",
+  "createdAt": "2026-06-05T11:56:48.359Z",
+  "updatedAt": "2026-06-05T11:56:48.363Z",
+  "totalEntries": 1,
+  "sessions": [
+    {
+      "id": "64a304d3-eda6-4c53-99c7-e1c965b1512f",
+      "startedAt": "2026-06-05T11:56:48.362Z",
+      "endedAt": "2026-06-05T11:56:48.362Z",
+      "entryCount": 1
+    }
+  ],
+  "entries": [
+    {
+      "id": "entry_1780660608362_crsyxf",
+      "sessionId": "64a304d3-eda6-4c53-99c7-e1c965b1512f",
+      "index": 1,
+      "timestamp": "2026-06-05T11:56:48.362Z",
+      "prompt": {
+        "role": "user",
+        "content": "yes proceed",
+        "filesOpen": [
+          "d:\\Python\\react-ui-builder\\src\\components\\Sidebar\\ComponentTab.tsx",
+          "d:\\Python\\react-ui-builder\\src\\App.tsx"
+        ],
+        "filesModified": [
+          "d:\\Python\\react-ui-builder\\src\\components\\Sidebar\\index.tsx",
+          "d:\\Python\\react-ui-builder\\src\\components\\PropertiesPanel\\index.tsx",
+          "d:\\Python\\react-ui-builder\\src\\App.tsx"
+        ],
+        "timestamp": "2026-06-05T11:56:48.362Z"
+      },
+      "response": {
+        "role": "assistant",
+        "content": "",
+        "summary": "",
+        "timestamp": "2026-06-05T11:56:48.362Z"
+      },
+      "context": {
+        "filesRead": [],
+        "codeSnippets": [],
+        "workingDirectory": "d:\\Python\\react-ui-builder"
+      },
+      "decisions": [],
+      "tags": [],
+      "importance": 0.5,
+      "metadata": {}
+    }
+  ]
+}
